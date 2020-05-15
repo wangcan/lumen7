@@ -23,9 +23,14 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+ $app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
+//config
+// jwt
+$app->configure('jwt');
+// api
+$app->configure('api');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,13 +77,16 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
+$app->middleware([
 //     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+       //'locale' => App\Http\Middleware\ChangeLocale::class,
+]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'cors' => palanik\lumen\Middleware\LumenCors::class,
+    'auth' => App\Http\Middleware\Authenticate::class,
+    //'serializer' => \Liyu\Dingo\SerializerSwitch::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +102,14 @@ $app->configure('app');
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+//jwt
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+//$app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +125,7 @@ $app->configure('app');
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
+    require __DIR__.'/../routes/api/v1.php';
     require __DIR__.'/../routes/web.php';
 });
 
